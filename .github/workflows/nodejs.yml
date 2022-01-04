@@ -1,13 +1,9 @@
 name: node-actions
 on:
   pull_request_target:
-    branches:
-      - master
+    branches: [master]
   push:
-    branches:
-      - '*'
-      - '*/**'
-      - '!master'
+    branches: [master]
 
 jobs:
   lint:
