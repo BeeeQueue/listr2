@@ -1,4 +1,6 @@
-import * as clone from 'clone'
+import rfdc from 'rfdc'
+
+const clone = rfdc({ circles: true })
 
 /**
  * Deep clones a object in the most easiest manner.

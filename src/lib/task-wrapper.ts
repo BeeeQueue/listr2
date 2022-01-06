@@ -1,4 +1,4 @@
-import * as through from 'through'
+import through from 'through'
 
 import { BELL_REGEX, CLEAR_LINE_REGEX } from '@constants/clearline-regex.constants'
 import { ListrTaskState } from '@constants/state.constants'
@@ -7,7 +7,6 @@ import { ListrBaseClassOptions, ListrSubClassOptions, ListrTask } from '@interfa
 import { ListrRendererFactory } from '@interfaces/renderer.interface'
 import { Task } from '@lib/task'
 import { Listr } from '@root/listr'
-import { cloneObject } from '@utils/general'
 import { createPrompt, destroyPrompt } from '@utils/prompt'
 import { PromptOptions } from '@utils/prompt.interface'
 
@@ -17,19 +16,14 @@ import { PromptOptions } from '@utils/prompt.interface'
 export class TaskWrapper<Ctx, Renderer extends ListrRendererFactory> {
   constructor (public task: Task<Ctx, ListrRendererFactory>, public errors: ListrError<Ctx>[], private options: ListrBaseClassOptions<Ctx, any, any>) {}
 
-  /** Change the title of the current task. */
-  set title (data: string) {
-    this.task.title$ = data
-  }
-
   /** Get the title of the current task. */
   get title (): string {
     return this.task.title
   }
 
-  /** Send a output to the output channel. */
-  set output (data: string) {
-    this.task.output$ = data
+  /** Change the title of the current task. */
+  set title (data: string) {
+    this.task.title$ = data
   }
 
   /** Get the output from the output channel. */
@@ -37,12 +31,17 @@ export class TaskWrapper<Ctx, Renderer extends ListrRendererFactory> {
     return this.task.output
   }
 
+  /** Send a output to the output channel. */
+  set output (data: string) {
+    this.task.output$ = data
+  }
+
   /** Create a new subtask with given renderer selection from the parent task. */
-  public newListr (
-    task: ListrTask<Ctx, Renderer> | ListrTask<Ctx, Renderer>[] | ((parent: Omit<this, 'skip' | 'enabled'>) => ListrTask<Ctx, Renderer> | ListrTask<Ctx, Renderer>[]),
-    options?: ListrSubClassOptions<Ctx, Renderer>
-  ): Listr<Ctx, any, any> {
-    let tasks: ListrTask<Ctx, Renderer> | ListrTask<Ctx, Renderer>[]
+  public newListr<NewCtx = Ctx>(
+    task: ListrTask<NewCtx, Renderer> | ListrTask<NewCtx, Renderer>[] | ((parent: Omit<this, 'skip' | 'enabled'>) => ListrTask<NewCtx, Renderer> | ListrTask<NewCtx, Renderer>[]),
+    options?: ListrSubClassOptions<NewCtx, Renderer>
+  ): Listr<NewCtx, any, any> {
+    let tasks: ListrTask<NewCtx, Renderer> | ListrTask<NewCtx, Renderer>[]
 
     if (typeof task === 'function') {
       tasks = task(this)
@@ -50,12 +49,14 @@ export class TaskWrapper<Ctx, Renderer extends ListrRendererFactory> {
       tasks = task
     }
 
-    return new Listr<Ctx, any, any>(tasks, options)
+    return new Listr<NewCtx, any, any>(tasks, options, this.task)
   }
 
   /** Report a error in process for error collection. */
   public report (error: Error, type: ListrErrorTypes): void {
-    this.errors.push(new ListrError<Ctx>(error, type, cloneObject(this.task.listr.ctx), cloneObject(this.task)))
+    if (this.task.options.collectErrors !== false) {
+      this.errors.push(new ListrError<Ctx>(error, type, this.task))
+    }
 
     this.task.message$ = { error: error.message ?? this.task?.title ?? 'Task with no title.' }
   }
