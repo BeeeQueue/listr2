@@ -21,7 +21,7 @@
     "url": "https://srcs.kilic.dev"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "scripts": {
     "build": "tsup-node",
