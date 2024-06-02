@@ -93,7 +93,7 @@
     "jest-mock-process": "^1.4.1",
     "lint-staged": "^12.1.5",
     "prettier": "^2.5.1",
-    "rimraf": "^3.0.2",
+    "rimraf": "^5.0.7",
     "simple-git-hooks": "^2.7.0",
     "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
