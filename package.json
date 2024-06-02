@@ -85,7 +85,7 @@
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
     "@types/through": "^0.0.30",
-    "@types/wrap-ansi": "^3.0.0",
+    "@types/wrap-ansi": "^8.1.0",
     "delay": "^5.0.0",
     "enquirer": "^2.3.6",
     "eslint": "^8.6.0",
